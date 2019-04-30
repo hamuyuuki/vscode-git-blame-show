@@ -53,18 +53,29 @@ export function activate(context: vscode.ExtensionContext) {
          }
     });
 
-
     let gitShow = vscode.commands.registerCommand('extension.gitShow', () => {
-        const result1 = child_process.execSync('cd /Users/hamuyuuki32/src/github.com/hamuyuuki/dotfiles; git blame setup.sh').toString();
+        const workspaceFolderPath = vscode.workspace.workspaceFolders![0].uri.fsPath;
+        const documentAbsolutePath = vscode.window.activeTextEditor!.document.fileName;
+
+        let result = null;
+        if (documentAbsolutePath.includes(workspaceFolderPath)) {
+            const documentRelativePath = documentAbsolutePath.replace(workspaceFolderPath + '/', '');
+            result = child_process.execSync(`cd ${workspaceFolderPath} && git blame ${documentRelativePath}`).toString();
+        } else {
+            const splitedDocumentAbsolutePath = documentAbsolutePath.match(/^\/private\/tmp\/vscode-git-blame-show\/([a-zA-Z0-9_-]+)\/([a-z0-9]+)\/(.*)/);
+            const commitNumber = splitedDocumentAbsolutePath![2]
+            const documentRelativePath = splitedDocumentAbsolutePath![3]
+            result = child_process.execSync(`cd ${workspaceFolderPath} && git blame ${commitNumber} ${documentRelativePath}`).toString();
+        }
 
         const lineNumber = vscode.window.activeTextEditor!.selection.active.line;
-        const lines = result1.split("\n");
-        const commit = lines[lineNumber].match(/^([a-z0-9]*) \(([a-z0-9A-Z-]*) *(\d\d\d\d-\d\d-\d\d \d\d\:\d\d\:\d\d \+\d\d\d\d)/)![1];
+        const lines = result!.split("\n");
+        const commit = lines[lineNumber].match(/^([a-z0-9^]*) \(([a-z0-9A-Z-_]*) *(\d\d\d\d-\d\d-\d\d \d\d\:\d\d\:\d\d \+\d\d\d\d)/)![1];
 
         child_process.execSync(`cd /Users/hamuyuuki32/src/github.com/hamuyuuki/dotfiles; git show ${commit} > /tmp/${commit}`).toString();
 
-        // var uri = vscode.Uri.parse(`file:///tmp/${commit}`);
-        // vscode.workspace.openTextDocument(uri).then(doc => vscode.window.showTextDocument(doc)).then(doc => vscode.languages.setTextDocumentLanguage(doc.document, "diff"));
+        var uri = vscode.Uri.parse(`file:///tmp/${commit}`);
+        vscode.workspace.openTextDocument(uri).then(doc => vscode.window.showTextDocument(doc)).then(doc => vscode.languages.setTextDocumentLanguage(doc.document, "diff"));
     });
 
     let gitShowFile = vscode.commands.registerCommand('extension.gitShowFile', () => {
