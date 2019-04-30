@@ -16,16 +16,20 @@
     ],
     "main": "./out/extension",
     "contributes": {
-        "commands": [{
-            "command": "extension.gitBlame",
-            "title": "Git Blame"
-        },{
-            "command": "extension.gitShow",
-            "title": "Git Show"
-        },{
-            "command": "extension.gitShowFile",
-            "title": "Git Show File"
-        }]
+        "commands": [
+            {
+                "command": "extension.gitBlame",
+                "title": "Git Blame"
+            },
+            {
+                "command": "extension.gitShow",
+                "title": "Git Show"
+            },
+            {
+                "command": "extension.gitShowFile",
+                "title": "Git Show File"
+            }
+        ]
     },
     "scripts": {
         "vscode:prepublish": "yarn run compile",

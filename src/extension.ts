@@ -2,8 +2,8 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
-
 import * as child_process from 'child_process';
+// import * as os from 'os';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -19,12 +19,24 @@ export function activate(context: vscode.ExtensionContext) {
     let gitBlame = vscode.commands.registerCommand('extension.gitBlame', () => {
         // The code you place here will be executed every time your command is executed
 
-        const result = child_process.execSync('cd /Users/hamuyuuki32/src/github.com/hamuyuuki/dotfiles; git blame setup.sh').toString();
+        const workspaceFolderPath = vscode.workspace.workspaceFolders![0].uri.fsPath;
+        const documentAbsolutePath = vscode.window.activeTextEditor!.document.fileName;
 
-        const lines = result.split("\n");
+        let result = null;
+        if (documentAbsolutePath.includes(workspaceFolderPath)) {
+            const documentRelativePath = documentAbsolutePath.replace(workspaceFolderPath + '/', '');
+            result = child_process.execSync(`cd ${workspaceFolderPath} && git blame ${documentRelativePath}`).toString();
+        } else {
+            const splitedDocumentAbsolutePath = documentAbsolutePath.match(/^\/private\/tmp\/vscode-git-blame-show\/([a-zA-Z0-9_-]+)\/([a-z0-9]+)\/(.*)/);
+            const commitNumber = splitedDocumentAbsolutePath![2]
+            const documentRelativePath = splitedDocumentAbsolutePath![3]
+            result = child_process.execSync(`cd ${workspaceFolderPath} && git blame ${commitNumber} ${documentRelativePath}`).toString();
+        }
+
+        const lines = result!.split("\n");
 
         for (let line in lines) {
-            const words = lines[line].match(/^([a-z0-9]*) \(([a-z0-9A-Z-]*) *(\d\d\d\d-\d\d-\d\d \d\d\:\d\d\:\d\d \+\d\d\d\d)/);
+            const words = lines[line].match(/^([a-z0-9^]*) \(([a-z0-9A-Z-_]*) *(\d\d\d\d-\d\d-\d\d \d\d\:\d\d\:\d\d \+\d\d\d\d)/);
 
             const commit = words![1];
             const author = `${words![2]}________________`.substr(0, 16);
@@ -38,16 +50,7 @@ export function activate(context: vscode.ExtensionContext) {
             });
             const range = new vscode.Range(Number.parseInt(line), 0, Number.parseInt(line), 0);
             vscode.window.activeTextEditor!.setDecorations(decoration, [range]);
-
-            vscode.window.activeTextEditor!.options = {
-				cursorStyle: vscode.TextEditorCursorStyle.Block
-			};
          }
-        // コマンドで行を取得して、ファイル名とコミット番号をもとにgit openする
-
-        //  new file and show commit and enable colortheme
-        //  read only mode and enter line
-        //  read only mode and open old code
     });
 
 
@@ -60,8 +63,8 @@ export function activate(context: vscode.ExtensionContext) {
 
         child_process.execSync(`cd /Users/hamuyuuki32/src/github.com/hamuyuuki/dotfiles; git show ${commit} > /tmp/${commit}`).toString();
 
-        var uri = vscode.Uri.parse(`file:///tmp/${commit}`);
-        vscode.workspace.openTextDocument(uri).then(doc => vscode.window.showTextDocument(doc)).then(doc => vscode.languages.setTextDocumentLanguage(doc.document, "diff"));
+        // var uri = vscode.Uri.parse(`file:///tmp/${commit}`);
+        // vscode.workspace.openTextDocument(uri).then(doc => vscode.window.showTextDocument(doc)).then(doc => vscode.languages.setTextDocumentLanguage(doc.document, "diff"));
     });
 
     let gitShowFile = vscode.commands.registerCommand('extension.gitShowFile', () => {
@@ -70,9 +73,6 @@ export function activate(context: vscode.ExtensionContext) {
         const parentCommitNumber = child_process.execSync(`cd /Users/hamuyuuki32/src/github.com/hamuyuuki/dotfiles; git log -1 ${commitNumber} --pretty="format:%P"`).toString();
 
         child_process.execSync(`cd /Users/hamuyuuki32/src/github.com/hamuyuuki/dotfiles; mkdir /tmp/${parentCommitNumber}; git show ${parentCommitNumber}:setup.sh >/tmp/${parentCommitNumber}/setup.sh`).toString();
-
-        var uri = vscode.Uri.parse(`file:///tmp/${parentCommitNumber}/setup.sh`);
-        vscode.workspace.openTextDocument(uri).then(doc => vscode.window.showTextDocument(doc)).then(doc => vscode.languages.setTextDocumentLanguage(doc.document, "shell"));
     });
     context.subscriptions.push(gitBlame);
     context.subscriptions.push(gitShow);
