@@ -44,11 +44,14 @@ export function activate(context: vscode.ExtensionContext) {
             const decoration = vscode.window.createTextEditorDecorationType({
                 isWholeLine: true,
                 before: {
-                    contentText: `${commit} ${author} ${date} |`,
-                    color: 'rgba(0, 255, 0, 0.7)'
-                }
+                    contentText: `${commit} ${author} ${date}`,
+                    color: 'black',
+                    backgroundColor: 'white',
+                    border: "4px solid white",
+                    margin: "10px"
+                },
             });
-            const range = new vscode.Range(Number.parseInt(line), 0, Number.parseInt(line), 0);
+            const range = new vscode.Range(Number.parseInt(line), 10, Number.parseInt(line), 10);
             vscode.window.activeTextEditor!.setDecorations(decoration, [range]);
          }
     });
@@ -76,7 +79,8 @@ export function activate(context: vscode.ExtensionContext) {
         child_process.execSync(`cd ${workspaceFolderPath} && git show ${commit} > /private/tmp/vscode-git-blame-show/${workspaceFolderName}/${commit}.log`).toString();
 
         var uri = vscode.Uri.parse(`file:///private/tmp/vscode-git-blame-show/${workspaceFolderName}/${commit}.log`);
-        vscode.workspace.openTextDocument(uri).then(doc => vscode.window.showTextDocument(doc)).then(doc => vscode.languages.setTextDocumentLanguage(doc.document, "diff"));
+        uri
+        // vscode.workspace.openTextDocument(uri).then(doc => vscode.window.showTextDocument(doc)).then(doc => vscode.languages.setTextDocumentLanguage(doc.document, "diff"));
     });
 
     let gitShowFile = vscode.commands.registerCommand('extension.gitShowFile', () => {
