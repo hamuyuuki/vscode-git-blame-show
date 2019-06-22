@@ -39,15 +39,15 @@ export function activate(context: vscode.ExtensionContext) {
             const words = lines[line].match(/^([a-z0-9^]*) \(([a-z0-9A-Z-_]*) *(\d\d\d\d-\d\d-\d\d \d\d\:\d\d\:\d\d \+\d\d\d\d)/);
 
             const commit = words![1];
-            const author = `${words![2]}________________`.substr(0, 16);
+            const author = `${words![2]}____________`.substr(0, 12);
             const date = words![3];
             const decoration = vscode.window.createTextEditorDecorationType({
                 isWholeLine: true,
                 before: {
                     contentText: `${commit} ${author} ${date}`,
-                    color: 'black',
-                    backgroundColor: 'white',
-                    border: "4px solid white",
+                    color: '#93a1a1',
+                    backgroundColor: '#002b36',
+                    border: "4px solid #002b36",
                     margin: "10px"
                 },
             });
