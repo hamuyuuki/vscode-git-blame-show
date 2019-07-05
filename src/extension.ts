@@ -66,7 +66,7 @@ export function activate(context: vscode.ExtensionContext) {
             const documentRelativePath = documentAbsolutePath.replace(workspaceFolderPath + '/', '');
             result = child_process.execSync(`cd ${workspaceFolderPath} && git blame ${documentRelativePath}`).toString();
         } else {
-            const splitedDocumentAbsolutePath = documentAbsolutePath.match(/^\/private\/tmp\/vscode-git-blame-show\/([a-zA-Z0-9_-]+)\/([a-z0-9]+)\/(.*)/);
+            const splitedDocumentAbsolutePath = documentAbsolutePath.match(/^\/tmp\/vscode-git-blame-show\/([a-zA-Z0-9_-]+)\/([a-z0-9]+)\/(.*)/);
             const commitNumber = splitedDocumentAbsolutePath![2]
             const documentRelativePath = splitedDocumentAbsolutePath![3]
             result = child_process.execSync(`cd ${workspaceFolderPath} && git blame ${commitNumber} ${documentRelativePath}`).toString();
@@ -76,19 +76,18 @@ export function activate(context: vscode.ExtensionContext) {
         const lines = result!.split("\n");
         const commit = lines[lineNumber].match(/^([a-z0-9^]*) \(([a-z0-9A-Z-_]*) *(\d\d\d\d-\d\d-\d\d \d\d\:\d\d\:\d\d \+\d\d\d\d)/)![1].replace('^', '');
 
-        child_process.execSync(`cd ${workspaceFolderPath} && git show ${commit} > /private/tmp/vscode-git-blame-show/${workspaceFolderName}/${commit}.log`).toString();
+        child_process.execSync(`cd ${workspaceFolderPath} && git show ${commit} > /tmp/vscode-git-blame-show/${workspaceFolderName}/${commit}.log`).toString();
 
-        var uri = vscode.Uri.parse(`file:///private/tmp/vscode-git-blame-show/${workspaceFolderName}/${commit}.log`);
-        uri
-        // vscode.workspace.openTextDocument(uri).then(doc => vscode.window.showTextDocument(doc)).then(doc => vscode.languages.setTextDocumentLanguage(doc.document, "diff"));
+        var uri = vscode.Uri.parse(`file:///tmp/vscode-git-blame-show/${workspaceFolderName}/${commit}.log`);
+        vscode.workspace.openTextDocument(uri).then(doc => vscode.window.showTextDocument(doc)).then(doc => vscode.languages.setTextDocumentLanguage(doc.document, "diff"));
     });
 
     let gitShowFile = vscode.commands.registerCommand('extension.gitShowFile', () => {
         const commitNumber = vscode.window.activeTextEditor!.document.getText(new vscode.Range(0,50,0,0)).split(" ")[1];
+        const workspaceFolderPath = vscode.workspace.workspaceFolders![0].uri.fsPath;
+        const parentCommitNumber = child_process.execSync(`cd ${workspaceFolderPath} ; git log -1 ${commitNumber} --pretty="format:%P"`).toString();
 
-        const parentCommitNumber = child_process.execSync(`cd /Users/hamuyuuki32/src/github.com/hamuyuuki/dotfiles; git log -1 ${commitNumber} --pretty="format:%P"`).toString();
-
-        child_process.execSync(`cd /Users/hamuyuuki32/src/github.com/hamuyuuki/dotfiles; mkdir /tmp/${parentCommitNumber}; git show ${parentCommitNumber}:setup.sh >/tmp/${parentCommitNumber}/setup.sh`).toString();
+        child_process.execSync(`cd ${workspaceFolderPath} ; mkdir /tmp/${parentCommitNumber}; git show ${parentCommitNumber}:setup.sh >/tmp/${parentCommitNumber}/setup.sh`).toString();
     });
     context.subscriptions.push(gitBlame);
     context.subscriptions.push(gitShow);
