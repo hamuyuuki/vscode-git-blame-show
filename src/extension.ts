@@ -78,8 +78,10 @@ export function activate(context: vscode.ExtensionContext) {
 
         child_process.execSync(`cd ${workspaceFolderPath} && git show ${commit} > /tmp/vscode-git-blame-show/${workspaceFolderName}/${commit}.log`).toString();
 
+
         var uri = vscode.Uri.parse(`file:///tmp/vscode-git-blame-show/${workspaceFolderName}/${commit}.log`);
-        vscode.workspace.openTextDocument(uri).then(doc => vscode.window.showTextDocument(doc)).then(doc => vscode.languages.setTextDocumentLanguage(doc.document, "diff"));
+        vscode.commands.executeCommand('vscode.diff', uri, uri);
+        // vscode.workspace.openTextDocument(uri).then(doc => vscode.window.showTextDocument(doc)).then(doc => vscode.languages.setTextDocumentLanguage(doc.document, "diff"));
     });
 
     let gitShowFile = vscode.commands.registerCommand('extension.gitShowFile', () => {

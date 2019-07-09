@@ -29,7 +29,25 @@
                 "command": "extension.gitShowFile",
                 "title": "Git Show File"
             }
-        ]
+        ],
+        "viewsContainers": {
+            "activitybar": [
+                {
+                    "id": "vscode-git-blame-show",
+                    "title": "vscode-git-blame-show",
+                    "icon": ""
+                }
+            ]
+        },
+        "views": {
+            "vscode-git-blame-show": [
+                {
+                "id": "vscode-git-blame-show-node",
+                "name": "vscode-git-blame-show-node",
+                "when": "explorer"
+                }
+            ]
+        }
     },
     "scripts": {
         "vscode:prepublish": "yarn run compile",
