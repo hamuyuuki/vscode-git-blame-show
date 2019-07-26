@@ -3,6 +3,7 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import * as child_process from 'child_process';
+import { FtpExplorer } from './ftpExplorer';
 // import * as os from 'os';
 
 // this method is called when your extension is activated
@@ -94,6 +95,7 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(gitBlame);
     context.subscriptions.push(gitShow);
     context.subscriptions.push(gitShowFile);
+    new FtpExplorer(context);
 }
 
 // this method is called when your extension is deactivated

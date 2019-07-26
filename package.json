@@ -3,8 +3,9 @@
     "displayName": "vscode-git-blame-show",
     "description": "",
     "version": "0.0.1",
+    "enableProposedApi": true,
     "engines": {
-        "vscode": "^1.29.0"
+        "vscode": "^1.32.0"
     },
     "categories": [
         "Other"
@@ -12,43 +13,80 @@
     "activationEvents": [
         "onCommand:extension.gitBlame",
         "onCommand:extension.gitShow",
-        "onCommand:extension.gitShowFile"
+        "onCommand:extension.gitShowFile",
+        "onView:ftpExplorer"
     ],
     "main": "./out/extension",
-    "contributes": {
-        "commands": [
-            {
-                "command": "extension.gitBlame",
-                "title": "Git Blame"
-            },
-            {
-                "command": "extension.gitShow",
-                "title": "Git Show"
-            },
-            {
-                "command": "extension.gitShowFile",
-                "title": "Git Show File"
-            }
-        ],
-        "viewsContainers": {
-            "activitybar": [
-                {
-                    "id": "vscode-git-blame-show",
-                    "title": "vscode-git-blame-show",
-                    "icon": ""
-                }
-            ]
-        },
-        "views": {
-            "vscode-git-blame-show": [
-                {
-                "id": "vscode-git-blame-show-node",
-                "name": "vscode-git-blame-show-node",
-                "when": "explorer"
-                }
-            ]
-        }
-    },
+	"contributes": {
+		"viewsContainers": {
+			"activitybar": [
+				{
+					"id": "package-explorer",
+					"title": "Package Explorer",
+					"icon": "media/dep.svg"
+				}
+			]
+		},
+		"views": {
+			"package-explorer": [
+				{
+					"id": "ftpExplorer",
+					"name": "FTP Explorer"
+				}
+			]
+		},
+		"commands": [
+
+			{
+				"command": "ftpExplorer.refresh",
+				"title": "Refresh",
+				"icon": {
+					"light": "resources/light/refresh.svg",
+					"dark": "resources/dark/refresh.svg"
+				}
+			},
+			{
+				"command": "ftpExplorer.openFtpResource",
+				"title": "Open FTP Resource"
+			},
+			{
+				"command": "ftpExplorer.revealResource",
+				"title": "Reveal in FTP View"
+			}
+		],
+		"menus": {
+			"commandPalette": [
+				{
+					"command": "ftpExplorer.revealResource"
+				}
+			],
+			"view/title": [
+				{
+					"command": "ftpExplorer.refresh",
+					"when": "view == ftpExplorer",
+					"group": "navigation"
+				}
+			],
+			"view/item/context": [
+				{
+					"command": "fileExplorer.refreshFile",
+					"when": "view == fileExplorer && viewItem == file",
+					"group": "inline"
+				}
+			]
+		},
+		"configuration": [
+			{
+				"title": "JSON Outline",
+				"properties": {
+					"jsonOutline.autorefresh": {
+						"type": "boolean",
+						"default": false
+					}
+				}
+			}
+		]
+	},
     "scripts": {
         "vscode:prepublish": "yarn run compile",
         "compile": "tsc -p ./",
@@ -57,10 +95,16 @@
         "test": "yarn run compile && node ./node_modules/vscode/bin/test"
     },
     "devDependencies": {
-        "typescript": "^2.6.1",
-        "vscode": "^1.1.21",
-        "tslint": "^5.8.0",
-        "@types/node": "^8.10.25",
-        "@types/mocha": "^2.2.42"
-    }
+        "typescript": "^3.5.1",
+        "vscode": "^1.1.34",
+        "tslint": "^5.12.1",
+        "@types/node": "^10.12.21",
+        "ftp": "^0.3.10"
+    },
+    "dependencies": {
+		"jsonc-parser": "^0.4.2",
+		"ftp": "^0.3.10",
+		"mkdirp": "^0.5.1",
+		"rimraf": "^2.6.2"
+	}
 }
