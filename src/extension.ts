@@ -29,8 +29,8 @@ export function activate(context: vscode.ExtensionContext) {
             result = child_process.execSync(`cd ${workspaceFolderPath} && git blame ${documentRelativePath}`).toString();
         } else {
             const splitedDocumentAbsolutePath = documentAbsolutePath.match(/^\/private\/tmp\/vscode-git-blame-show\/([a-zA-Z0-9_-]+)\/([a-z0-9]+)\/(.*)/);
-            const commitNumber = splitedDocumentAbsolutePath![2]
-            const documentRelativePath = splitedDocumentAbsolutePath![3]
+            const commitNumber = splitedDocumentAbsolutePath![2];
+            const documentRelativePath = splitedDocumentAbsolutePath![3];
             result = child_process.execSync(`cd ${workspaceFolderPath} && git blame ${commitNumber} ${documentRelativePath}`).toString();
         }
 
@@ -68,8 +68,8 @@ export function activate(context: vscode.ExtensionContext) {
             result = child_process.execSync(`cd ${workspaceFolderPath} && git blame ${documentRelativePath}`).toString();
         } else {
             const splitedDocumentAbsolutePath = documentAbsolutePath.match(/^\/tmp\/vscode-git-blame-show\/([a-zA-Z0-9_-]+)\/([a-z0-9]+)\/(.*)/);
-            const commitNumber = splitedDocumentAbsolutePath![2]
-            const documentRelativePath = splitedDocumentAbsolutePath![3]
+            const commitNumber = splitedDocumentAbsolutePath![2];
+            const documentRelativePath = splitedDocumentAbsolutePath![3];
             result = child_process.execSync(`cd ${workspaceFolderPath} && git blame ${commitNumber} ${documentRelativePath}`).toString();
         }
 
